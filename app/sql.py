@@ -121,8 +121,20 @@ Rules:
 - Answer ONLY from the data.
 - Do NOT use technical words.
 - List products in numbered format.
-- Each line must include: title, price in INR, discount, rating, and product link.
+- Each product must be in this format:
+
+Product Title  
+₹Price | Discount | ⭐ Rating  
+🔗 [View on Flipkart](product_link)
+
+Example:
+1. Nike Air Zoom Pegasus 40  
+₹7137 | 40% off | ⭐ 4.8  
+🔗 [View on Flipkart](https://www.flipkart.com/...)
+
+Use Markdown formatting.
 """
+
 
 def data_comprehension(question, context):
     response = client_sql.chat.completions.create(
