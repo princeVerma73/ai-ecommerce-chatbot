@@ -13,11 +13,8 @@ import shutil
 # Define index path FIRST
 index_save_dir = Path(__file__).parent / ".semantic_router"
 
-# Now safe to delete old cache
-shutil.rmtree(index_save_dir, ignore_errors=True)
-
-# Recreate folder
-index_save_dir.mkdir(exist_ok=True)
+if not index_save_dir.exists():
+    index_save_dir.mkdir(exist_ok=True)
 
 # Encoder: Converts text → vectors
 encoder = HuggingFaceEncoder(
