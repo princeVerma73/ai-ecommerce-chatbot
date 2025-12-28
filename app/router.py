@@ -11,14 +11,14 @@ index_save_dir = Path("/tmp/semantic_router")
 index_save_dir.mkdir(exist_ok=True)
 
 # -----------------------------
-# Encoder (HF model)
+# Encoder
 # -----------------------------
 encoder = HuggingFaceEncoder(
     name="sentence-transformers/all-MiniLM-L6-v2"
 )
 
 # -----------------------------
-# Local index (persistent)
+# Local index
 # -----------------------------
 index = LocalIndex(
     name="my_local_index",
@@ -61,9 +61,10 @@ sql = Route(
 routes = [faq, sql]
 
 # -----------------------------
-# Build index ONLY ONCE
+# Build index ONLY if empty
+# (directory-based check, safe)
 # -----------------------------
-if index.count() == 0:
+if not any(index_save_dir.iterdir()):
     all_utterances = []
     route_mapping = []
 
@@ -91,7 +92,7 @@ router = SemanticRouter(
 )
 
 # -----------------------------
-# Test locally (optional)
+# Local test
 # -----------------------------
 if __name__ == "__main__":
     print(router("What is your policy on defective products?").name)
