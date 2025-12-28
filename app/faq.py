@@ -2,9 +2,9 @@ import pandas as pd
 from pathlib import Path
 import chromadb
 from chromadb.utils import embedding_functions
-from groq import Groq
 from dotenv import load_dotenv
 import os
+from groq import Groq
 
 load_dotenv()  # for .env file
 
@@ -13,7 +13,10 @@ load_dotenv()  # for .env file
 faqs_path=Path(__file__).parent / "resources/faq_data.csv"
 chroma_client=chromadb.Client()
 collection_name_faq='faqs'
-groq_client=Groq()
+#groq_client=Groq()
+def get_groq_client():
+    return Groq(api_key=os.getenv("GROQ_API_KEY"))
+
 
 
 ef=embedding_functions.SentenceTransformerEmbeddingFunction(   # Converts questions → vectors
@@ -67,12 +70,19 @@ def get_relevant_qa(query):
 # → LLM
 # → Final answer
 def faq_chain(query):
-    result=get_relevant_qa(query)
-    context=''.join([r.get('answer') for r in result['metadatas'][0]])
-    answer=generate_answer(query,context)
+    groq_client = get_groq_client()
+
+    result = get_relevant_qa(query)
+
+    context = " ".join(
+        r.get("answer", "") for r in result["metadatas"][0]
+    )
+
+    answer = generate_answer(query, context, groq_client)
     return answer
 
-def generate_answer(query,context): # tell the LLM
+
+def generate_answer(query,context,groq_client): # tell the LLM
     prompt=f'''
     You are a customer support chatbot for an e-commerce company.
     Answer using ONLY the information provided in the context.
