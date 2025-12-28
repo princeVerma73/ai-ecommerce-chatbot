@@ -1,34 +1,33 @@
 from semantic_router import Route
 from semantic_router.routers import SemanticRouter
 from semantic_router.encoders import HuggingFaceEncoder
-# # it means You are NOT calling the website.
-# Model comes from Hugging Face’s model hub
-# Not because it calls the website every time
 from semantic_router.index import LocalIndex
 from pathlib import Path
-from semantic_router import Route
 
-import shutil
+# -----------------------------
+# Persistent index directory
+# -----------------------------
+index_save_dir = Path("/tmp/semantic_router")
+index_save_dir.mkdir(exist_ok=True)
 
-# Define index path FIRST
-index_save_dir = Path(__file__).parent / ".semantic_router"
-
-if not index_save_dir.exists():
-    index_save_dir.mkdir(exist_ok=True)
-
-# Encoder: Converts text → vectors
+# -----------------------------
+# Encoder (HF model)
+# -----------------------------
 encoder = HuggingFaceEncoder(
     name="sentence-transformers/all-MiniLM-L6-v2"
 )
 
-# Stores embeddings locally
+# -----------------------------
+# Local index (persistent)
+# -----------------------------
 index = LocalIndex(
     name="my_local_index",
     save_dir=index_save_dir
 )
 
-
+# -----------------------------
 # Define routes
+# -----------------------------
 faq = Route(
     name="FAQ",
     utterances=[
@@ -59,30 +58,31 @@ sql = Route(
     ]
 )
 
-
 routes = [faq, sql]
 
-# Manually populate index
-# (Required for your library version)
-all_utterances = []
-route_mapping = []
+# -----------------------------
+# Build index ONLY ONCE
+# -----------------------------
+if index.count() == 0:
+    all_utterances = []
+    route_mapping = []
 
-for route in routes:
-    for utterance in route.utterances:
-        all_utterances.append(utterance)
-        route_mapping.append(route.name)
+    for route in routes:
+        for utterance in route.utterances:
+            all_utterances.append(utterance)
+            route_mapping.append(route.name)
 
-# Create embeddings
-embeddings = encoder(all_utterances)
+    embeddings = encoder(all_utterances)
 
-# Add to index (IMPORTANT)
-index.add(
-    embeddings=embeddings,
-    utterances=all_utterances,
-    routes=route_mapping
-)
+    index.add(
+        embeddings=embeddings,
+        utterances=all_utterances,
+        routes=route_mapping
+    )
 
-# Build semantic router
+# -----------------------------
+# Semantic Router
+# -----------------------------
 router = SemanticRouter(
     routes=routes,
     encoder=encoder,
@@ -90,7 +90,9 @@ router = SemanticRouter(
     top_k=1,
 )
 
-# Test
+# -----------------------------
+# Test locally (optional)
+# -----------------------------
 if __name__ == "__main__":
     print(router("What is your policy on defective products?").name)
     print(router("Pink puma shoes in price range 5000 to 10000").name)
