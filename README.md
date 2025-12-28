@@ -89,15 +89,15 @@ Business_Project2/
 ▶️ How to Run Locally
 
 1️⃣ Clone the repository
-  git clone https://github.com/princeVerma73/ai-ecommerce-chatbot.git
-  cd ai-ecommerce-chatbot
+      git clone https://github.com/princeVerma73/ai-ecommerce-chatbot.git
+      cd ai-ecommerce-chatbot
 2️⃣ Install dependencies
-  pip install -r requirements.txt
+      pip install -r requirements.txt
 3️⃣ Set environment variables
-  GROQ_API_KEY=your_api_key_here
-  GROQ_MODEL=llama-3.3-70b-versatile
+      GROQ_API_KEY=your_api_key_here
+      GROQ_MODEL=llama-3.3-70b-versatile
 4️⃣ Run the app
-  streamlit run app/main.py
+      streamlit run app/main.py
 ```
 ```
 👤 Author
