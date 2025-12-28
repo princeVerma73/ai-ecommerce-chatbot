@@ -55,6 +55,7 @@ This project combines **LLMs, SQL, semantic routing, and web-scraped data** to d
 
 ## 📂 Project Structure
 
+```
 Business_Project2/
 │
 ├── app/
@@ -75,14 +76,16 @@ Business_Project2/
 ├── .gitignore
 ├── README.md
 └── requirements.txt
-
+```
+```
 🧪 Example Queries
 * show shoes under 500
 * top 3 puma shoes under 2000
 * cheapest shoes with rating above 4
 * best shoes under 1000
 * nike shoes under 5000 with rating above 4.5
-
+```
+```
 ▶️ How to Run Locally
 
 1️⃣ Clone the repository
@@ -95,11 +98,12 @@ Business_Project2/
   GROQ_MODEL=llama-3.3-70b-versatile
 4️⃣ Run the app
   streamlit run app/main.py
-
+```
+```
 👤 Author
 Prince Verma
 📧 Aspiring Data Scientist | GenAI Enthusiast
 🔗 GitHub: princeVerma73
-
+```
 
 
