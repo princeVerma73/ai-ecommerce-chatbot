@@ -1,9 +1,10 @@
 streamlit
-pandas
-numpy
-sqlite-utils
-python-dotenv
 groq
 semantic-router
+chromadb
+langchain
+langchain-community
 sentence-transformers
-scikit-learn
+pandas
+numpy
+python-dotenv
