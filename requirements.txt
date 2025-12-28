@@ -1,8 +1,10 @@
 streamlit
 pandas
 numpy
-sqlite3
+sqlite-utils
 python-dotenv
 groq
+langchain
+langchain-community
+langchain-groq
 sentence-transformers
-scikit-learn
