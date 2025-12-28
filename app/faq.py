@@ -1,3 +1,4 @@
+import streamlit as st
 import pandas as pd
 from pathlib import Path
 import chromadb
@@ -6,15 +7,17 @@ from groq import Groq
 from dotenv import load_dotenv
 import os
 
-load_dotenv()  # for .env file
+#load_dotenv()  # for .env file
 
 
 #to access file path
 faqs_path=Path(__file__).parent / "resources/faq_data.csv"
 chroma_client=chromadb.Client()
 collection_name_faq='faqs'
-groq_client=Groq()
-
+#groq_client=Groq()
+groq_client = Groq(
+    api_key=st.secrets["GROQ_API_KEY"]
+)
 
 ef=embedding_functions.SentenceTransformerEmbeddingFunction(   # Converts questions → vectors
     model_name='sentence-transformers/all-MiniLM-L6-v2',       # means Used for semantic matching
