@@ -4,24 +4,35 @@ import re
 import sqlite3
 import pandas as pd
 from pathlib import Path
+import shutil
 
-# -----------------------------
+# =============================
 # GROQ CONFIG (STREAMLIT SAFE)
-# -----------------------------
+# =============================
 client_sql = Groq(
     api_key=st.secrets["GROQ_API_KEY"]
 )
 
 MODEL = st.secrets["GROQ_MODEL"]
 
-# -----------------------------
-# SQLITE (WRITABLE PATH)
-# -----------------------------
-db_path = "/tmp/db.sqlite"
+# =============================
+# SQLITE SETUP (CRITICAL FIX)
+# =============================
+# Repo DB (read-only, must exist in app/)
+REPO_DB_PATH = Path(__file__).parent / "db.sqlite"
 
-# -----------------------------
+# Writable DB location on Streamlit Cloud
+TMP_DB_PATH = Path("/tmp/db.sqlite")
+
+# Copy DB once at runtime
+if not TMP_DB_PATH.exists():
+    shutil.copy(REPO_DB_PATH, TMP_DB_PATH)
+
+db_path = str(TMP_DB_PATH)
+
+# =============================
 # SQL PROMPT
-# -----------------------------
+# =============================
 sql_prompt = """
 You are an expert in understanding database schemas and generating SQL queries.
 
@@ -57,33 +68,33 @@ Interpret vague terms as follows:
 - If no number is given, always LIMIT 5
 """
 
-# -----------------------------
-# SQL GENERATION
-# -----------------------------
-def generate_sql_query(question):
-    chat_completion = client_sql.chat.completions.create(
+# =============================
+# GENERATE SQL FROM LLM
+# =============================
+def generate_sql_query(question: str) -> str:
+    response = client_sql.chat.completions.create(
         messages=[
             {"role": "system", "content": sql_prompt},
-            {"role": "user", "content": question}
+            {"role": "user", "content": question},
         ],
         model=MODEL,
         temperature=0.2,
-        max_tokens=1024
+        max_tokens=1024,
     )
-    return chat_completion.choices[0].message.content
+    return response.choices[0].message.content
 
-# -----------------------------
+# =============================
 # RUN SQLITE QUERY
-# -----------------------------
-def run_query(query):
+# =============================
+def run_query(query: str):
     if query.strip().upper().startswith("SELECT"):
         with sqlite3.connect(db_path) as conn:
             return pd.read_sql_query(query, conn)
 
-# -----------------------------
+# =============================
 # SQL CHAIN
-# -----------------------------
-def sql_chain(question):
+# =============================
+def sql_chain(question: str) -> str:
     sql_response = generate_sql_query(question)
 
     matches = re.findall(r"<SQL>(.*?)</SQL>", sql_response, re.DOTALL)
@@ -100,26 +111,29 @@ def sql_chain(question):
     context = df.head(5).to_dict(orient="records")
     return data_comprehension(question, context)
 
-# -----------------------------
+# =============================
 # DATA COMPREHENSION
-# -----------------------------
+# =============================
 comprehension_prompt = """
 You are an expert in understanding the context of the question and replying based on the data provided.
 
 Rules:
 - Answer ONLY from the data.
-- No technical words.
+- Do NOT use technical words.
 - List products in numbered format.
-- Each line must include: title, price in INR, discount, rating, and link.
+- Each line must include: title, price in INR, discount, rating, and product link.
 """
 
 def data_comprehension(question, context):
-    chat_completion = client_sql.chat.completions.create(
+    response = client_sql.chat.completions.create(
         messages=[
             {"role": "system", "content": comprehension_prompt},
-            {"role": "user", "content": f"QUESTION: {question} DATA: {context}"}
+            {
+                "role": "user",
+                "content": f"QUESTION: {question} DATA: {context}",
+            },
         ],
         model=MODEL,
-        temperature=0.2
+        temperature=0.2,
     )
-    return chat_completion.choices[0].message.content
+    return response.choices[0].message.content
