@@ -71,13 +71,10 @@ def get_relevant_qa(query):
 # → Final answer
 def faq_chain(query):
     groq_client = get_groq_client()
-
     result = get_relevant_qa(query)
-
     context = " ".join(
         r.get("answer", "") for r in result["metadatas"][0]
     )
-
     answer = generate_answer(query, context, groq_client)
     return answer
 
