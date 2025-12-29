@@ -25,11 +25,11 @@ This project combines **LLMs, SQL, semantic routing, and web-scraped data** to d
 - 🗄️ **SQLite Database**
   - Product data stored locally in `db.sqlite`
   - Efficient querying using Pandas + SQLite
-
-### 🧹 Web Scraping Pipeline
-- Scraped real **Flipkart women’s shoes** product data using **Selenium** *(for learning & educational purposes only)*
-- Performed data cleaning and preprocessing
-- Converted structured **CSV data → SQLite database** for efficient querying
+    
+-  🧹 Web Scraping Pipeline
+  - Scraped real **Flipkart women’s shoes** product data using **Selenium** *(for learning & educational purposes only)*
+  - Performed data cleaning and preprocessing
+  - Converted structured **CSV data → SQLite database** for efficient querying
 
 - 💬 **Conversational Responses**
   - Outputs human-readable answers with:
